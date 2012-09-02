@@ -6,13 +6,6 @@
 \interdisplaylinepenalty=2500
 
 
-%\usepackage[T1,T2A]{fontenc}
-%\usepackage[OT2,T1]{fontenc}
-%\usepackage[utf8]{inputenc}
-%\usepackage[LCY,OT1]{fontenc}
-%\usepackage[OT1,LCY]{fontenc}
-
-%OT2, LWN, LCY, X2, T2C, T2B, T2A, 
 \usepackage[utf8]{inputenc}
 \usepackage[OT2,OT1]{fontenc}
 \usepackage[ukrainian,english]{babel}
@@ -53,12 +46,6 @@ filter approach and attitude error equation of inertial navigation system.
 Simulation results are presented to demonstrate the  performance of the 
 proposed approach. 
 \end{abstract}
-% IEEEtran.cls defaults to using nonbold math in the Abstract.
-% This preserves the distinction between vectors and scalars. However,
-% if the conference you are submitting to favors bold math in the abstract,
-% then you can use LaTeX's standard command \boldmath at the very start
-% of the abstract to achieve this. Many IEEE journals/conferences frown on
-% math in the abstract anyway.
 
 % no keywords
 \begin{IEEEkeywords}
@@ -164,37 +151,65 @@ by using the optimal Kalman filter, the generalized state space  equation of a c
 where  $\Phi_{ISNS;k} =\left|\begin{array}{cc} {\Phi_{INS,k} } & {0} \\ {0} & {\Phi_{GNSS,k} } \end{array}\right|\, -$ known 
 state propagation matrix, which is formed on the basis of the$\Phi_{ISNS} $, $\Phi_{{\rm GNSS}} $ matrices, models 
 of correlated components of GNSS and INS; 
-$\xi _{ISNS;k} =\left|\begin{array}{c} {\xi _{INS,k} } \\ {\xi _{{\rm SNS,\; }k} } \end{array}\right|\,$  -- vector 
+$\xi _{ISNS;k} =\left|\begin{array}{c} {\xi _{INS,k} } \\ {\xi _{SNS,k} } \end{array}\right|\,$  -- vector 
 of zero mean white Gaussian noise with covariance matrix $Q_{ISNS;k} \, $ (process noise matrix), of two corresponding navigation systems. 
 
 Equation for estimation of $\hat{{\bf x}}_{ISNS;k} $, with certain assumptions, derived 
 from the general equations of optimal filtering and have the form:
 
-
-
 \begin{equation} 
-\label{GrindEQ__1_} 
-\begin{array}{l} {\hat{{\bf x}}_{ISNS;k} =\tilde{{\bf x}}_{ISNS;k|k-1} +K_{k} (z_{GNSS,k} -\stackrel{\frown}{z}_{ISNS;k} );} \\ 
-{\stackrel{\frown}{z}_{ISNS,k} =G(z_{INS,k} -_{INS,k} \tilde{{\bf x}}_{INS,k|k-1} )+_{{\rm SNS,\; }k} \tilde{{\bf x}}_{{\rm SNS,\; }k|k-1} ;} 
-\end{array} \end{equation} 
-
-\begin{equation} \label{GrindEQ__2_} \tilde{{\bf x}}_{ISNS;k|k-1} =\Phi_{ISNS;k} 
-\hat{{\bf x}}_{ISNS;k-1} ;\, \tilde{{\bf x}}_{INS,k|k-1} =\Phi_{INS,k} \hat{{\bf x}}_{INS,k-1} ;\, \tilde{{\bf x}}_{{\rm SNS,\; }k|k-1} 
-=\Phi_{{\rm SNS,\; }k} \hat{{\bf x}}_{{\rm SNS,\; }k-1} ; 
+  \begin{array}{l} 
+  {\hat{{\bf x}}_{ISNS;k} =\tilde{{\bf x}}_{ISNS;k|k-1} +K_{k} (z_{GNSS,k} -\stackrel{\frown}{z}_{ISNS;k} );} \\ 
+    {\begin{split}
+    \stackrel{\frown}{z}_{ISNS,k} = & G(z_{INS,k} -M_{INS,k} \tilde{{\bf x}}_{INS,k|k-1} )+ \\
+				  +   & M_{SNS,k} \tilde{{\bf x}}_{SNS,k|k-1} 
+    \end{split}}
+  \end{array} 
+  \label{eq:k1} 
 \end{equation} 
 
-\[\begin{array}{l} {K_{k} =P_{k|k-1} H_{k}^{{\rm T}} (H_{k} P_{k|k-1} H_{k}^{{\rm T}} +N_{k} )^{-1} ;} \\ 
-{P_{k|k-1} =\Phi_{ISNS;k} P_{k-1} \Phi_{ISNS;k}^{{\rm B}} +Q_{ISNS;k} ;} \end{array}\] 
+\begin{equation} 
+\begin{array}{l}
+  \tilde{{\bf x}}_{ISNS;k|k-1} = \Phi_{ISNS;k} \hat{{\bf x}}_{ISNS;k-1} ; \\
+ % \tilde{{\bf x}}_{INS,k|k-1} = \Phi_{INS,k} \hat{{\bf x}}_{INS,k-1} ; \\
+ % \tilde{{\bf x}}_{SNS,k|k-1} = \Phi_{SNS,k} \hat{{\bf x}}_{SNS,k-1} ; 
+  \end{array}
+  \label{eq:k2} 
+\end{equation} 
+\begin{equation}
+  K_{k} =P_{k|k-1} H_{k}^{{\rm T}} (H_{k} P_{k|k-1} H_{k}^{{\rm T}} +N_{k} )^{-1}
+  \label{eq:k3}
+\end{equation}
+\begin{equation}
+  P_{k|k-1} =\Phi_{ISNS;k} P_{k-1} \Phi_{ISNS;k}^{{\rm B}} +Q_{ISNS;k}
+  \label{eq:k4}
+\end{equation}
+\begin{equation}
+  P_{k} =P_{k|k-1} -K_{k} H_{k} P_{k|k-1}
+  \label{eq:k5}
+\end{equation}
+\begin{equation}
+  \begin{split}
+  H_{k} = & \frac{\partial }{\partial V_{ISNS;k} } [G(Z_{INS,k} -M_{INS,k} {\bf x}_{INS,k} ) + \\
+  + & M_{SNS, k}{\bf x}_{SNS, k}]_{{\bf x}_{ISNS, k} =\tilde{{\bf x}}_{ISNS, k|k-1} }
+  \end{split}
+\end{equation}
 
-\[\begin{array}{l} {P_{k} =P_{k|k-1} -K_{{\rm D,}\, \, \, k} H_{k} P_{k|k-1} ;} \\ 
-{H_{k} =\frac{\partial }{\partial V_{ISNS;k} } \left[G(Z_{INS,k} -_{INS,k} {\bf x}_{INS,k} )+_{{\rm S}NS,\, k} 
-{\bf x}_{{\rm S}NS,\, k} \right]_{{\bf x}_{{\rm I}SNS,\, k} =\tilde{{\bf x}}_{{\rm I}SNS,\, k|k-1} } ,} \end{array}\] 
 
-%where $z_{{\rm GNSS}} $, $z_{{\rm INS}} $ $-$ observation vectors of GNSS and INS; \textbf{G }$-$ known matrix of vector function \textbf{G}(\textbf{$\hat{{\bf x}}_{ISNS;k} $}),  that connects the radio navigation signal parameters with the estimated state vector\textbf{$\hat{{\bf x}}_{ISNS;k} $}; $M_{{\rm GNSS}} $, $\, M_{{\rm INS}} $$-$ known matrices error of observation process from GNSS and INS; $\stackrel{\frown}{z}_{ISNS} $$-$ estimation of observation vector; $\tilde{{\bf x}}_{ISNS} $, $\tilde{{\bf x}}_{{\rm INS}} $, $\tilde{{\bf x}}_{{\rm SNS}} $$-$ errors of estimation of complex system, INS and GNSS errors; $\tilde{{\bf x}}_{ISNS;k|k-1} $ и $P_{k|k-1} $ $-$ corresponding errors of INS, GNSS and covariance matrix for moment \textbf{Р} \textit{k},\textit{ }calculated based on  measurements in previous time stamps\textit{ k }$-$1, \textit{k }$-$2; \textbf{Н} $-$ measurement matrix; \textbf{N} $-$ measurement noise covariance matrix.
-where $z_{GNSS}$, $z_{INS}$ -- observatin vector of GNSS and INS; ${bf G}$ -- known matrix of vector function ${bf G}(\hat{{\bf x}}_{ISNS;k} $
+%
+where $z_{GNSS} $, $z_{{\rm INS}}$ -- observation vectors of GNSS and INS; 
+${\bf G}$ -- known matrix of vector function  \textbf{G}(\textbf{$\hat{{\bf x}}_{ISNS;k} $}),  
+that connects the radio navigation signal parameters with the estimated state 
+vector$\hat{{\bf x}}_{ISNS;k}$; 
+$M_{GNSS}$, $M_{{\rm INS}}$  -- known matrices error of observation process from GNSS and INS; 
+$\stackrel{\frown}{z}_{ISNS}$ -- estimation of observation vector; 
+$\tilde{{\bf x}}_{ISNS} $, $\tilde{{\bf x}}_{{\rm INS}} $, $\tilde{{\bf x}}_{{\rm SNS}}$ -- errors of
+estimation of complex system, INS and GNSS errors; 
+$\tilde{{\bf x}}_{ISNS;k|k-1}$ and $P_{k|k-1} $ $-$ corresponding errors of INS, GNSS and 
+covariance matrix for moment $P_{k}$, calculated based on measurements in previous 
+time stamps $k-1$, $k-2$; $H$ -- measurement matrix; $N$ -- measurement noise covariance matrix.
+
 Simulations of proposed filtering approach were done with simplified variant of inertial navigation system with following equation of motion:
-
-
 \begin{equation}
 \begin{array}{l}
   \displaystyle \dot{\varphi }=\frac{V_{N} }{R_{E} +h} ; \dot{h}=V_{U} ; \dot{\vartheta }=\omega -\frac{V_{N} }{R_{E} +h} ;\\
@@ -228,20 +243,21 @@ For simulation purposes next parameters of inertial sensors was used:
  \end{table}
 
 
-Performance of complementary filter presented on fig.\ref{fig:coomp_v}, \ref{fig:coomp_pos}, \ref{theta_err}, and \ref{theta_err_of_err}. In particular fig. \ref{} shows the extrapolation 
+Performance of complementary filter presented on fig.\ref{fig:coomp_v}, \ref{fig:comp_pos}, \ref{fig:theta_err_err}, 
+and \ref{fig:theta_err}. In particular fig. \ref{fig:theta_err} shows the extrapolation 
 of the INS angular orientation errors. 
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=3.1in]{vn_err_of_err}
-  \caption{Figure 3.  Estimation error of velocity}
+  \includegraphics[width=3.5in]{vn_err_of_err}
+  \caption{Estimation error of velocity}
   \label{fig:coomp_v}
 \end{figure}
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=3.1in]{phi_err_of_err}
-  \caption{Figure 3.  Estimation error of positon}
+  \includegraphics[width=3.5in]{phi_err_of_err}
+  \caption{Estimation error of positon}
   \label{fig:comp_pos}
 \end{figure}
 
@@ -272,14 +288,14 @@ one order of magnitude lower the noise density.
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=3.1in]{theta_err_of_err}
+  \includegraphics[width=3.5in]{theta_err_of_err}
   \caption{Attitude estimation error}
   \label{fig:theta_err_err}
 \end{figure}
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=3.1in]{theta_err}
+  \includegraphics[width=3.5in]{theta_err}
   \caption{Prediction of  INS attitude error}
   \label{fig:theta_err}
 \end{figure}
@@ -291,16 +307,16 @@ Since no stage correction, extrapolated attitude INS error diverges with the
 time. Approach can be used quite successful in case if UAVs operation time 
 or attitude correction time (for instance steady flight without acceleration) 
 less then diverge time of filter.
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=3.1in]{theta_err_of_err_2}
-  \caption{Attitude estimation error in case of 10\% error in initial condition for gyro bias}
-  \label{fig:theta_err_err2}
-\end{figure}
+% \begin{figure}[!t]
+%   \centering
+%   \includegraphics[width=3.5in]{theta_err_of_err_2}
+%   \caption{Attitude estimation error in case of 10\% error in initial condition for gyro bias}
+%   \label{fig:theta_err_err2}
+% \end{figure}
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=3.1in]{theta_err_2}
+  \includegraphics[width=3.5in]{theta_err_2}
   \caption{Prediction of  INS attitude error in case of 10\% error in initial condition for gyro bias}
   \label{fig:theta_err2}
 \end{figure}
