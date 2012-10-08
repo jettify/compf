@@ -2,8 +2,7 @@ Complementary Filter for UAV
 ============================
 This is my paper about complementary filter, UAV and
 navigation data fusion. Can be useful as example or
-template for creation your own paper or Latex presentation
-beamer.
+template for creation of your own paper or Latex presentation.
 
 Abstract
 --------
