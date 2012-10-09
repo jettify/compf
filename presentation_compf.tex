@@ -61,23 +61,75 @@
 \section{Introduction} 
 \subsection{Introduction} 
 \begin{frame}\frametitle{Introduction}
-\small
-\beamerbutton{\smallПостановка задачі}: дослідження можливостей комплексування навігаційної інформації двох систем, що є на борту сучасного літака: безплатформенної інерціальної навігаційної системи і супутникової високоточної навігаційної системи.\\
+{\tiny
+Unmanned Aerial Vehicles (UAVs) have been under development since the beginning of flight
+because they can eliminate the risk to a pilot’s life and they are generally inexpensive to procure.
+Most UAVs are controlled remotely from a ground control station but automation systems are
+being progressively integrated for autonomous operation. GPS (Global Positioning System) and
+other sophisticated navigation systems make it possible for UAVs to take over high-risk aerial
+missions that required manned aircraft.}
+
+% \beamerbutton{\smallПостановка задачі}: \\
 \centering \line(1,0){200}
 
-\begin{block}<+->{В результатi комплексування IНС та СНС досягаються:}
+\begin{block}<+->{Some UAV Applications}
 \tiny
 \begin{enumerate}
-\item  пiдвищення точностi визначення координат, висоти, швидкостi i часу споживача;
-\item  уточнення кутiв орiєнтацiї (курсу, крену i тангажа);
-\item  оцiнка й уточнення параметрiв калiбрування навiгацiйних датчикiв,
-таких, як дрейфи гiроскопiв, масштабнi коефiцiєнти, зсуви нуля акселерометрів тощо;
-\item  забезпечення на цiй основi безперервностi навiгацiйних визначень на всiх етапах руху, у тому числi i при тимчасовiй непрацездатностi приймача СНС у випадках впливу завад або енергiйних маневрiв ЛА.
+\item  \beamerbutton{\tiny Border interdiction}. Patrol of the borders by aerial platforms.
+\item  \beamerbutton{\tiny Search and rescue.} Looking for survivors from shipwrecks, aircraft accidents etc.
+
+\item  \beamerbutton{\tiny Wild fire suppression.} UAVs equipped with infrared sensors can detect fire in
+forests and notify the fire brigade on time.
+
+\item \beamerbutton{\tiny Law enforcement.} VTOL UAVs can take
+the role of police helicopters in a more
+cost effective way.
+
+\item \beamerbutton{\tiny Industrial applications.} Such
+applications can be crops spraying,
+nuclear factory surveillance, surveillance
+of pipelines etc.
 
 \end{enumerate}
 \end{block}
 
 \end{frame} 
+%%%%<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+\subsection{Kalman Filter Disadvantages} 
+\begin{frame}\frametitle{Kalman Filter Disadvantages} 
+\tiny
+\begin{block}{Noise Whiteness}
+It is known from the theory, that the Kalman filter is optimal in case that a) the model 
+perfectly matches the real system, b) the entering noise is white and c) the covariances of 
+the noise are exactly known. In practice it is difficult to estimate process covariance noise
+and whiteness of noise should be investigated.
+\end{block}
+\begin{block}{Linearization}
+In case of nonlinear systems Extended Kalman Filter is adopted where
+by means of Taylor series expansion, nonlinear systems is linearized and
+approximated around each current state estimate. When large deviations between
+the estimated state trajectory and the nominal trajectory exist, the nonlinear model
+is weakly approximated bye Taylor series expansion around the conditional mean.
+\end{block}
+\begin{exampleblock}{Covariance Calculations }
+The problem of Kalman filter divergence caused by covariance calculations,
+which has been with system developers since the 1960s, is still with the aerospace
+community. Basically, the covariance matrix $P_k(+)$ becomes too small resulting
+in a small $K$ and thus eliminates the weighting on new measurements.
+
+% This results in the new state estimate after update staying the same as the estimate
+% before update (since K k approaches zero). This estimate is then propagated
+% forward and the same thing occurs at the next measurement time. The filter, in
+% effect, is rejecting all of the new measurements and relying only on its own
+% propagated values for covariance which keep getting smaller and making things
+% worse. This is a loss of system integrity.
+
+\end{exampleblock}
+
+
+
+
+\end{frame}
 %%%%<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 \section{Complementary filter} 
 \begin{frame}%[plain]
@@ -110,6 +162,7 @@
 %%%%<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 \begin{frame}
 \frametitle{Simple INS}
+
 \begin{block}{Equation of Motion}
 \begin{equation}
 \begin{array}{l}
@@ -119,25 +172,39 @@
   \end{array} 
   \label{eq:ins}
 \end{equation}
+
+
 \end{block}
+{\tiny
 $\varphi$,$h$- latitude and height; \\
 $V_{N}$, $V_{U}$- North and Up velocity; \\
 $a_{N}$, $a_{U}$ - North and Up acceleration; \\
 $a_{y}$, $a_{z}$ - acceleration in body frame (accelerometers output); \\
-$\vartheta$ - pitch angle;$\omega $- angular velocity in body frame (gyro output); \\
-$R_{E}$- Earth radius;
+$\vartheta$ - pitch angle;\\
+$\omega $- angular velocity in body frame (gyro output); \\
+$R_{E}$- Earth radius;}
+
+\begin{block}{Equation of Motion}
+\begin{equation}
+ \delta \dot{\vartheta }=-\frac{1}{R_{E} +h} \delta V_{N} +\frac{V_{N} }{(R_{E} +h)^{2} } \delta h+\varepsilon
+ \label{eq:ins_att}
+\end{equation}
+\end{block}
+{\tiny
+$\delta h$- INS height error; 
+$\delta V_{N} $- INS North velocity error; 
+$\delta \vartheta $- attitude error; 
+$\varepsilon $- gyro bias.}
 \end{frame}
 
 %%%%<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 \subsection{Sensors Parameters}
 \begin{frame}
 \frametitle{Sensors Parameters}
-\begin{block}{Sensors}
+\begin{block}{Simulation Parameters}
 \begin{table}%[H]
 \centering
 \centering
-\renewcommand{\arraystretch}{1.3}
-  \caption{Simulation Parameters}
     \begin{tabular}{|l|p{50mm}|} \hline 
       Parameter & Value \\ \hline  \hline 
       Gyro bias & $100^{\circ } /hr$ \\ \hline 
@@ -199,9 +266,9 @@ $R_{E}$- Earth radius;
 \begin{frame}%[plain]
 \begin{block}{sudo rm -rf / }
   \centering
-  Chears! \\
+  Cheers! \\
   @isinf\\
-  https://github.com/phen0m
+  https://github.com/phen0m/compf
 
 \end{block}
 \end{frame}
